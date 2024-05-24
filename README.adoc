@@ -8,9 +8,15 @@ This project is contains an example for AsciiDoc extensions.
 | **asciidoctor-helper-macros**
 | Helper macros for AsciiDoc
 
+| **healthchecks**
+| Helper for publishing to Confluence
+
+| **healthchecks**
+| Overview of the health of the components
+
 | **infrastructure**
 | Build containerfile
 
 | **versions**
-| Overview of the software versions of CESentry components
+| Overview of the versions of the components
 |===
