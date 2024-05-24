@@ -1,3 +1,16 @@
 = Showcase for Asciidoc extensions
 
-This project is contains an example for AsciiDoc extensions
+This project is contains an example for AsciiDoc extensions.
+
+|===
+| Module | Description
+
+| **asciidoctor-helper-macros**
+| Helper macros for AsciiDoc
+
+| **infrastructure**
+| Build containerfile
+
+| **versions**
+| Overview of the software versions of CESentry components
+|===
