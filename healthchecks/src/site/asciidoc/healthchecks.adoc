@@ -1,0 +1,31 @@
+= Healthchecks
+
+:description: This document lists the status of every component of the system.
+:toclevels: 2
+:sectnums:
+:icons: font
+:nofooter:
+:imagesdir: ./images
+
+[IMPORTANT]
+====
+This page is automatically updated, so please *do not* update manually.
+====
+
+== List of components health
+
+|===
+| Component | DEV | Test | Staging | Prod
+
+| Blog
+a| healthcheck:backends[component="blog" stage="dev"]
+a| healthcheck:backends[component="blog" stage="test"]
+a| healthcheck:backends[component="blog" stage="staging"]
+a| healthcheck:backends[component="blog" stage="prod"]
+
+| Redmine
+a| healthcheck:backends[component="redmine" stage="dev"]
+a| healthcheck:backends[component="redmine" stage="test"]
+a| healthcheck:backends[component="redmine" stage="staging"]
+a| healthcheck:backends[component="redmine" stage="prod"]
+|===

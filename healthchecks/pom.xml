@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>healthchecks</artifactId>
+    <packaging>pom</packaging>
+    <version>0.1</version>
+
+    <parent>
+        <groupId>dev.unexist.showcase</groupId>
+        <artifactId>confluence-publisher</artifactId>
+        <version>0.1</version>
+        <relativePath>../confluence-publisher/pom.xml</relativePath>
+    </parent>
+
+    <properties>
+        <sourceDirectory>./src/site/asciidoc</sourceDirectory>
+        <outputDirectory>./target/static/documentation</outputDirectory>
+        <asciidocDirectory>./src/site/asciidoc</asciidocDirectory>
+
+        <!-- Confluence config -->
+        <!-- NOTE: Be careful with the ancestorID, everything will be overwritten -->
+        <confluence.url>https://cesvelbert.atlassian.net/wiki</confluence.url>
+        <confluence.publishingStrategy>APPEND_TO_ANCESTOR</confluence.publishingStrategy>
+
+        <!-- Provide these values from env; don't commit them! -->
+        <confluence.spaceKey>SPACE_KEY</confluence.spaceKey>
+        <confluence.ancestorId>PAGE_ID</confluence.ancestorId>
+        <confluence.publisherUserName>${env.CONFLUENCE_USER}</confluence.publisherUserName>
+        <confluence.publisherPassword>${env.CONFLUENCE_TOKEN}</confluence.publisherPassword>
+    </properties>
+
+   <profiles>
+       <profile>
+           <id>generate-docs</id>
+           <build>
+               <plugins>
+                   <plugin>
+                       <groupId>org.asciidoctor</groupId>
+                       <artifactId>asciidoctor-maven-plugin</artifactId>
+                       <version>${asciidoctor.maven-plugin.version}</version>
+                       <dependencies>
+                           <dependency>
+                               <groupId>dev.unexist.showcase</groupId>
+                               <artifactId>asciidoctor-helper-macros</artifactId>
+                               <version>0.1</version>
+                           </dependency>
+                       </dependencies>
+                   </plugin>
+               </plugins>
+           </build>
+       </profile>
+       <profile>
+           <id>generate-docs-and-publish</id>
+           <build>
+               <plugins>
+                   <plugin>
+                       <groupId>org.sahli.asciidoc.confluence.publisher</groupId>
+                       <artifactId>asciidoc-confluence-publisher-maven-plugin</artifactId>
+                       <version>${confluence.publisher.version}</version>
+                       <dependencies>
+                           <dependency>
+                               <groupId>dev.unexist.showcase</groupId>
+                               <artifactId>asciidoctor-helper-macros</artifactId>
+                               <version>0.1</version>
+                           </dependency>
+                       </dependencies>
+                   </plugin>
+               </plugins>
+           </build>
+       </profile>
+   </profiles>
+</project>
