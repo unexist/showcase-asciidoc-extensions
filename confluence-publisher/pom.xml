@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>confluence-publisher</artifactId>
+    <packaging>pom</packaging>
+    <version>0.1</version>
+
+    <parent>
+        <groupId>dev.unexist.showcase</groupId>
+        <artifactId>showcase-asciidoc-extensions-parent</artifactId>
+        <version>0.1</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <asciidoctorj.diagram.version>2.3.0</asciidoctorj.diagram.version>
+        <asciidoctor.maven-plugin.version>3.0.0</asciidoctor.maven-plugin.version>
+        <maven-clean-plugin.version>3.3.2</maven-clean-plugin.version>
+        <maven-site-plugin.version>4.0.0-M14</maven-site-plugin.version>
+
+        <confluence.publisher.version>0.22.0</confluence.publisher.version>
+
+        <sourceDirectory>./src/site/asciidoc</sourceDirectory>
+        <outputDirectory>./target/static/documentation</outputDirectory>
+        <asciidocDirectory>./src/site/asciidoc</asciidocDirectory>
+
+        <!-- Confluence config -->
+        <!-- NOTE: Be careful with the ancestorID, everything will be overwritten -->
+        <confluence.url>https://cesvelbert.atlassian.net</confluence.url>
+        <confluence.publishingStrategy>APPEND_TO_ANCESTOR</confluence.publishingStrategy>
+
+        <!-- Provide these values from env; don't commit them! -->
+        <confluence.spaceKey></confluence.spaceKey>
+        <confluence.ancestorId></confluence.ancestorId>
+        <confluence.publisherUserName></confluence.publisherUserName>
+        <confluence.publisherPassword></confluence.publisherPassword>
+    </properties>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <version>${maven-site-plugin.version}</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.asciidoctor</groupId>
+                            <artifactId>asciidoctor-maven-plugin</artifactId>
+                            <version>${asciidoctor.maven-plugin.version}</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>${maven-clean-plugin.version}</version>
+                    <configuration>
+                        <filesets>
+                            <fileset>
+                                <directory>src/main/resources/static/documentation</directory>
+                                <followSymlinks>false</followSymlinks>
+                            </fileset>
+                        </filesets>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.asciidoctor</groupId>
+                    <artifactId>asciidoctor-maven-plugin</artifactId>
+                    <version>${asciidoctor.maven-plugin.version}</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.asciidoctor</groupId>
+                            <artifactId>asciidoctorj-diagram</artifactId>
+                            <version>${asciidoctorj.diagram.version}</version>
+                        </dependency>
+                    </dependencies>
+                    <configuration>
+                        <sourceDirectory>${sourceDirectory}</sourceDirectory>
+                        <outputDirectory>${outputDirectory}</outputDirectory>
+                        <attributes>
+                            <!-- Uses the <img src="data:image/png;base64> syntax for diagrams -->
+                            <data-uri/>
+                            <!-- Allows access to remote files (eg. code on external GitHub) -->
+                            <imagesdir>./images</imagesdir>
+                            <allow-uri-read>true</allow-uri-read>
+                        </attributes>
+                        <requires>
+                            <require>asciidoctor-diagram</require>
+                        </requires>
+                        <logHandler>
+                            <outputToConsole>true</outputToConsole>
+                            <failIf>
+                                <severity>DEBUG</severity>
+                            </failIf>
+                        </logHandler>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>generate-html-doc</id>
+                            <phase>generate-resources</phase>
+                            <goals>
+                                <goal>process-asciidoc</goal>
+                            </goals>
+                            <configuration>
+                                <backend>html5</backend>
+                                <attributes>
+                                    <toc>left</toc>
+                                    <sectanchors>true</sectanchors>
+                                    <source-highlighter>highlight.js</source-highlighter>
+                                </attributes>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.sahli.asciidoc.confluence.publisher</groupId>
+                    <artifactId>asciidoc-confluence-publisher-maven-plugin</artifactId>
+                    <version>${confluence.publisher.version}</version>
+                    <configuration>
+                        <asciidocRootFolder>${asciidocDirectory}</asciidocRootFolder>
+                        <sourceEncoding>UTF-8</sourceEncoding>
+                        <rootConfluenceUrl>${confluence.url}</rootConfluenceUrl>
+                        <spaceKey>${confluence.spaceKey}</spaceKey>
+                        <ancestorId>${confluence.ancestorId}</ancestorId>
+                        <username>${confluence.publisherUserName}</username>
+                        <password>${confluence.publisherPassword}</password>
+                        <pageTitlePrefix xml:space="preserve"/>
+                        <publishingStrategy>${confluence.publishingStrategy}
+                        </publishingStrategy>
+                        <orphanRemovalStrategy>KEEP_ORPHANS</orphanRemovalStrategy>
+                        <pageTitleSuffix
+                                xml:space="preserve"> [${project.version}]</pageTitleSuffix>
+                        <versionMessage>Version ${project.version}</versionMessage>
+                        <attributes>
+                            <version>${project.version}</version>
+                        </attributes>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>publish-documentation</id>
+                            <phase>generate-resources</phase>
+                            <goals>
+                                <goal>publish</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+</project>
