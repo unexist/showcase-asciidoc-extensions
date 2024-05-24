@@ -20,7 +20,7 @@
 
         <!-- Confluence config -->
         <!-- NOTE: Be careful with the ancestorID, everything will be overwritten -->
-        <confluence.url>https://cesvelbert.atlassian.net/wiki</confluence.url>
+        <confluence.url>CONFLUENCE_URL</confluence.url>
         <confluence.publishingStrategy>APPEND_TO_ANCESTOR</confluence.publishingStrategy>
 
         <!-- Provide these values from env; don't commit them! -->
