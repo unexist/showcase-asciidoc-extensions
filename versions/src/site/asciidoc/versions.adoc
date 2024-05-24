@@ -1,0 +1,38 @@
+= Component Versions
+
+:description: This document lists the version of every component of the system.
+:toclevels: 2
+:sectnums:
+:icons: font
+:nofooter:
+:imagesdir: ./images
+
+[IMPORTANT]
+====
+This page is automatically updated, so please *do not* update manually.
+====
+
+== List of component versions
+
+|===
+| Component | DEV | Test | Staging | Prod | iOS | Android
+
+| Maps
+4+h|
+a| checkversion:apps[component="maps" os="ios" stage="appstore"]
+a| checkversion:apps[component="maps" os="android" stage="appstore"]
+
+| Blog
+a| checkversion:backends[component="masternode" stage="dev"]
+a| checkversion:backends[component="masternode" stage="test"]
+a| checkversion:backends[component="masternode" stage="staging"]
+a| checkversion:backends[component="masternode" stage="prod"]
+2+h|
+
+| Redmine
+a| checkversion:backends[component="datanode" stage="dev"]
+a| checkversion:backends[component="datanode" stage="test"]
+a| checkversion:backends[component="datanode" stage="staging"]
+a| checkversion:backends[component="datanode" stage="prod"]
+2+h|
+|===
