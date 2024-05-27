@@ -16,7 +16,7 @@ require 'json'
 require 'date'
 
 include Asciidoctor
-include CESentryEnv
+include ShowcaseEnv
 
 class CheckversionInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
     use_dsl

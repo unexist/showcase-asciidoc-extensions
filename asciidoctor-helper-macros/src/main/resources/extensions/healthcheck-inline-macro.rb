@@ -5,7 +5,7 @@ require 'json'
 require 'date'
 
 include Asciidoctor
-include CESentryEnv
+include ShowcaseEnv
 ##
 # @package Showcase-Asciidoc-Extensions
 #
