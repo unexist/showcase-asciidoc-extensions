@@ -1,3 +1,14 @@
+##
+# @package Showcase-Asciidoc-Extensions
+#
+# @file Healthcheck inline macro
+# @copyright 2023-present Christoph Kappel <christoph@unexist.dev>
+# @version $Id$
+#
+# This program can be distributed under the terms of the Apache License v1.0.
+# See the file LICENSE for details.
+##
+
 require 'asciidoctor/extensions' unless RUBY_ENGINE == 'opal'
 require 'net/http'
 require 'uri'
@@ -6,16 +17,6 @@ require 'date'
 
 include Asciidoctor
 include ShowcaseEnv
-##
-# @package Showcase-Asciidoc-Extensions
-#
-# @file Healthcheck inline macro
-# @copyright 2024-present Christoph Kappel <christoph@unexist.dev>
-# @version $Id$
-#
-# This program can be distributed under the terms of the Apache License v2.0.
-# See the file LICENSE for details.
-##
 
 class HealthcheckInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
     use_dsl
@@ -24,12 +25,17 @@ class HealthcheckInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
     name_positional_attributes 'component', 'stage'
 
     HTML_SPAN = '<span style="width: 100%%; height: 100%%; display: inline-block; background-color: %s">%s</span>'
+    HTML_TICK = '<ac:emoticon ac:name="tick" />'
+    HTML_CROSS = '<ac:emoticon ac:name="cross" />'
 
     def process parent, target, attrs
         case target
         when 'backends'
             isAlive = handle_backends(attrs)
-            create_inline_pass(parent, HTML_SPAN % [(isAlive ? 'green' : 'red'), isAlive ? '(/)' : '(x)'])
+            create_inline_pass(parent, HTML_SPAN % [
+                isAlive ? 'green' : 'red',
+                isAlive ? HTML_TICK : HTML_CROSS,
+            ])
         end
     end
 
