@@ -15,17 +15,15 @@ module ShowcaseEnv
 
     URL_BLOG = {
         'DEV' => 'https://unexist.blog',
-        'SWT' => 'https://unexist.blog',
-        'SWT1' => 'https://unexist.blog',
-        'PQS' => 'https://unexist.blog',
-        'LIVE' => 'https://unexist.blog',
+        'TEST' => 'https://unexist.blog',
+        'STAGING' => 'https://unexist.blog',
+        'PROD' => 'https://unexist.blog',
     }
 
     URL_REDMINE = {
         'DEV' => 'https://subtle.de',
-        'SWT' => 'https://subtle.de',
-        'SWT1' => 'https://subtle.de',
-        'PQS' => 'https://subtle.de',
-        'LIVE' => 'https://subtle.de',
+        'TEST' => 'https://subtle.de',
+        'STAGING' => 'https://subtle.de',
+        'PROD' => 'https://subtle.de',
     }
 end
