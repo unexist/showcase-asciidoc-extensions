@@ -54,11 +54,11 @@ class CheckversionInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
         case attrs['component']
         when 'blog'
             if URL_BLOG.include? attrs['stage'].upcase
-                load_from_backend URL_BLOG[attrs['stage'].upcase]
+                load_from_backend URL_BLOG[attrs['stage'].upcase], ENV['API-KEY']
             end
         when 'redmine'
             if URL_REDMINE.include? attrs['stage'].upcase
-                load_from_backend URL_REDMINE[attrs['stage'].upcase]
+                load_from_backend URL_REDMINE[attrs['stage'].upcase], ENV['API-KEY']
             end
         end
     end
