@@ -11,7 +11,7 @@
 
 module ShowcaseEnv
     URL_APPSTORE_ANDROID = 'https://play.google.com/store/apps/details?id=com.google.android.apps.maps'
-    URL_APPSTORE_IOS = 'https://itunes.apple.com/lookup?id=585027354',
+    URL_APPSTORE_IOS = 'https://itunes.apple.com/lookup?id=585027354'
 
     URL_BLOG = {
         'DEV' => 'https://unexist.blog',
