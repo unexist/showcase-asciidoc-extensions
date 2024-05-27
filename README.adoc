@@ -8,7 +8,7 @@ This project is contains an example for AsciiDoc extensions.
 | **asciidoctor-helper-macros**
 | Helper macros for AsciiDoc
 
-| **healthchecks**
+| **confluence-publisher**
 | Helper for publishing to Confluence
 
 | **healthchecks**
