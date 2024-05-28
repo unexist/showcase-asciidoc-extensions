@@ -6,7 +6,7 @@ This project is contains an example for AsciiDoc extensions.
 | Module | Description
 
 | **asciidoctor-helper-macros**
-| Helper macros for AsciiDoc
+| Helper macros extension for AsciiDoc
 
 | **confluence-publisher**
 | Helper for publishing to Confluence
