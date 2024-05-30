@@ -23,16 +23,16 @@ a| checkversion:apps[component="maps" os="ios" stage="appstore"]
 a| checkversion:apps[component="maps" os="android" stage="appstore"]
 
 | Blog
-a| checkversion:backends[component="masternode" stage="dev"]
-a| checkversion:backends[component="masternode" stage="test"]
-a| checkversion:backends[component="masternode" stage="staging"]
-a| checkversion:backends[component="masternode" stage="prod"]
+a| checkversion:backends[component="blog" stage="dev"]
+a| checkversion:backends[component="blog" stage="test"]
+a| checkversion:backends[component="blog" stage="staging"]
+a| checkversion:backends[component="blog" stage="prod"]
 2+h|
 
 | Redmine
-a| checkversion:backends[component="datanode" stage="dev"]
-a| checkversion:backends[component="datanode" stage="test"]
-a| checkversion:backends[component="datanode" stage="staging"]
-a| checkversion:backends[component="datanode" stage="prod"]
+a| checkversion:backends[component="redmine" stage="dev"]
+a| checkversion:backends[component="redmine" stage="test"]
+a| checkversion:backends[component="redmine" stage="staging"]
+a| checkversion:backends[component="redmine" stage="prod"]
 2+h|
 |===
