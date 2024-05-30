@@ -92,7 +92,7 @@ class CheckversionInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
             'accept' => 'application/json'
         }
 
-        JSON.parse(data)['results'].first['version'].gsub(/[^0-9\.]/, '') rescue "x.x"
+        JSON.parse(data)['results'].first['version'].gsub(/[^0-9\.]/, '') rescue 'x.x'
     end
 
     def load_from_playstore url
@@ -119,7 +119,7 @@ class CheckversionInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
             'API-Key' => apiKey,
         }
 
-        JSON.parse(data)['version'].gsub(/[^0-9\.]/, '') rescue "x.x"
+        JSON.parse(data)['version'].gsub(/[^0-9\.]/, '') rescue 'x.x'
     end
 end
 
