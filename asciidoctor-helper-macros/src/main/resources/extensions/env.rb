@@ -26,4 +26,8 @@ module ShowcaseEnv
         'STAGING' => 'https://subtle.de',
         'PROD' => 'https://subtle.de',
     }
+
+    HTML_SPAN = '<span style="width: 100%%; height: 100%%; display: inline-block; background-color: %s">%s</span>'
+    HTML_TICK = '<ac:emoticon ac:name="tick" />'
+    HTML_CROSS = '<ac:emoticon ac:name="cross" />'
 end
