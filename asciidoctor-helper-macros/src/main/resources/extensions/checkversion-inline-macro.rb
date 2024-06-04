@@ -25,17 +25,24 @@ class CheckversionInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
     name_positional_attributes 'component', 'os', 'stage'
 
     def process parent, target, attrs
+        statusCode = 500
+        versionString = 'x.x'
+
         case target
         when 'apps'
-            create_inline_pass parent, handle_apps(attrs)
+            statusCode, versionString = handle_apps attrs
         when 'backends'
-            create_inline_pass parent, handle_backends(attrs)
+            statusCode, versionString = handle_backends attrs
         end
+
+        create_inline_pass parent, (200 == statusCode ? versionString : '%s (HTTP %d)' % [
+            versionString, statusCode
+        ])
     end
 
     private
 
-    def handle_apps(attrs)
+    def handle_apps attrs
         case attrs['component']
         when 'maps'
             case attrs['stage']
@@ -50,7 +57,7 @@ class CheckversionInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
         end
     end
 
-    def handle_backends(attrs)
+    def handle_backends attrs
         case attrs['component']
         when 'blog'
             if URL_BLOG.include? attrs['stage'].upcase
@@ -64,6 +71,7 @@ class CheckversionInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
     end
 
     def fetch_data uri, headers = {}
+        statusCode = 500
         retVal = ''
 
         begin
@@ -77,49 +85,56 @@ class CheckversionInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
                 http.request request
             }
 
-            unless response.nil? and 200 != response.code.to_i
+            unless response.nil?
+                statusCode = response.code.to_i
                 retVal = response.body
+
+                unless 200 == statusCode
+                    p "-" * 20, uri, response.body, "-" * 20
+                end
             end
         rescue => err
             p err
         end
 
-        retVal
+        [ statusCode, retVal ]
     end
 
     def load_from_appstore url
-        data = fetch_data URI.parse(url), {
+        statusCode, data = fetch_data URI.parse(url), {
             'accept' => 'application/json'
         }
+        versionString = JSON.parse(data)['results'].first['version'].gsub(/[^0-9\.]/, '') rescue 'x.x'
 
-        JSON.parse(data)['results'].first['version'].gsub(/[^0-9\.]/, '') rescue 'x.x'
+        [ statusCode, versionString ]
     end
 
     def load_from_playstore url
-        retVal = ''
         data = fetch_data URI.parse(url)
+        versionString = 'x.x'
 
         data.scan(/<script nonce=\"\S+\">AF_initDataCallback\((.*?)\);/) do |match|
             begin
                 matches = match.first.scan(/(\d+\.\d+\.\d+)/)
 
-                retVal = matches.first.first unless matches.nil? or matches.empty?
+                versionString = matches.first.first unless matches.nil? or matches.empty?
             rescue => err
                 p err
                 retVal = 'x.x'
             end unless match.nil?
         end unless data.nil?
 
-        retVal
+        [ statusCode, versionString ]
     end
 
     def load_from_backend url, apiKey = nil
-        data = fetch_data URI.parse(url), {
+        statusCode, jsonData = fetch_data URI.parse(url), {
             'accept' => 'application/json',
             'API-Key' => apiKey,
         }
+        versionString = JSON.parse(jsonData)['version'].gsub(/[^0-9\.]/, '') rescue 'x.x'
 
-        JSON.parse(data)['version'].gsub(/[^0-9\.]/, '') rescue 'x.x'
+        [ statusCode, versionString ]
     end
 end
 
