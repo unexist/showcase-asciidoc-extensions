@@ -24,24 +24,21 @@ class HealthcheckInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
     named :healthcheck
     name_positional_attributes 'component', 'stage'
 
-    HTML_SPAN = '<span style="width: 100%%; height: 100%%; display: inline-block; background-color: %s">%s</span>'
-    HTML_TICK = '<ac:emoticon ac:name="tick" />'
-    HTML_CROSS = '<ac:emoticon ac:name="cross" />'
-
     def process parent, target, attrs
         case target
         when 'backends'
-            isAlive = handle_backends(attrs)
+            statusCode = handle_backends(attrs)
+
             create_inline_pass(parent, HTML_SPAN % [
-                isAlive ? 'green' : 'red',
-                isAlive ? HTML_TICK : HTML_CROSS,
+                200 == statusCode ? 'green' : 'red',
+                200 == statusCode ? HTML_TICK : '%s (HTTP %d)' % [ HTML_CROSS, statusCode ],
             ])
         end
     end
 
     private
 
-    def handle_backends(attrs)
+    def handle_backends attrs
         case attrs['component']
         when 'blog'
             if URL_BLOG.include? attrs['stage'].upcase
@@ -55,7 +52,7 @@ class HealthcheckInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
     end
 
     def get_status uri, headers = {}
-        isAlive = false
+        statusCode = 500
 
         begin
             request = Net::HTTP::Get.new uri
@@ -68,21 +65,25 @@ class HealthcheckInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
                 http.request request
             }
 
-            unless response.nil? and 200 != response.code.to_i
-                isAlive = true
+            unless response.nil?
+                statusCode = response.code.to_i
+
+                unless 200 == statusCode
+                    p "-" * 20, uri.to_s, response.body, "-" * 20
+                end
             end
         rescue => err
             p err
         end
 
-        isAlive
+        statusCode
     end
 
     def load_from_backend url, apiKey = nil
         get_status URI.parse(url), {
             'accept' => 'application/json',
             'API-Key' => apiKey,
-        } rescue false
+        } rescue 500
     end
 end
 
