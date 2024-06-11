@@ -94,7 +94,7 @@
                         <logHandler>
                             <outputToConsole>true</outputToConsole>
                             <failIf>
-                                <severity>DEBUG</severity>
+                                <severity>ERROR</severity>
                             </failIf>
                         </logHandler>
                     </configuration>
