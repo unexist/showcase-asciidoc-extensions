@@ -18,22 +18,22 @@ This page is automatically updated, so please *do not* update manually.
 | Component | DEV | Test | Staging | Prod
 
 | Blog
-a| healthcheck:backends[component="blog" stage="dev"]
-a| healthcheck:backends[component="blog" stage="test"]
-a| healthcheck:backends[component="blog" stage="staging"]
-a| healthcheck:backends[component="blog" stage="prod"]
+a| healthcheck::backends[component="blog" stage="dev"]
+a| healthcheck::backends[component="blog" stage="test"]
+a| healthcheck::backends[component="blog" stage="staging"]
+a| healthcheck::backends[component="blog" stage="prod"]
 
 | Redmine
-a| healthcheck:backends[component="redmine" stage="dev"]
-a| healthcheck:backends[component="redmine" stage="test"]
-a| healthcheck:backends[component="redmine" stage="staging"]
-a| healthcheck:backends[component="redmine" stage="prod"]
+a| healthcheck::backends[component="redmine" stage="dev"]
+a| healthcheck::backends[component="redmine" stage="test"]
+a| healthcheck::backends[component="redmine" stage="staging"]
+a| healthcheck::backends[component="redmine" stage="prod"]
 |===
 
-healthcheck:store[filename="healthchecks"]
+healthcheck::store[filename="healthchecks"]
 
 [%noheader,cols="1,1"]
 |===
-a| healthplot::backends[filename="healthchecks" component="blog"]
-a| healthplot::backends[filename="healthchecks" component="redmine"]
+a| healthcheck::plot[filename="healthchecks" component="blog"]
+a| healthcheck::plot[filename="healthchecks" component="redmine"]
 |===
