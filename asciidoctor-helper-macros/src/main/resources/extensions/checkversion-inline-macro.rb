@@ -35,7 +35,7 @@ class CheckversionInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
             statusCode, versionString = handle_backends attrs
         end
 
-        create_inline_pass parent, (200 == statusCode ? versionString : '%s (HTTP %d)' % [
+        create_inline_pass parent, (200 == statusCode ? versionString : '%s (HTTP%d)' % [
             versionString, statusCode
         ])
     end
@@ -43,14 +43,19 @@ class CheckversionInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
     private
 
     def handle_apps attrs
-        case attrs['component']
-        when 'maps'
-            case attrs['stage']
-            when 'appstore'
-                case attrs['os']
-                when 'android'
+        upComponent = attrs['component'].upcase rescue 'MAPS'
+        upStage = attrs['stage'].upcase rescue 'APPSTORE'
+        upOs = attrs['os'].upcase rescue 'ANDROID'
+
+
+        case upComponent
+        when 'MAPS'
+            case upStage
+            when 'APPSTORE'
+                case upOs
+                when 'ANDROID'
                     load_from_playstore URL_APPSTORE_ANDROID
-                when 'ios'
+                when 'IOS'
                     load_from_appstore URL_APPSTORE_IOS
                 end
             end
@@ -58,16 +63,22 @@ class CheckversionInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
     end
 
     def handle_backends attrs
-        case attrs['component']
-        when 'blog'
-            if URL_BLOG.include? attrs['stage'].upcase
-                load_from_backend URL_BLOG[attrs['stage'].upcase], ENV['API-KEY']
+        upComponent = attrs['component'].upcase rescue 'BLOG'
+        upStage = attrs['stage'].upcase rescue 'DEV'
+        retVal = [ 500, '' ]
+
+        case upComponent
+        when 'BLOG'
+            if URL_BLOG.include? upStage
+                retVal = load_from_backend URL_BLOG[upStage], ENV['API-KEY']
             end
-        when 'redmine'
-            if URL_REDMINE.include? attrs['stage'].upcase
-                load_from_backend URL_REDMINE[attrs['stage'].upcase], ENV['API-KEY']
+        when 'REDMINE'
+            if URL_REDMINE.include? upStage
+                retVal = load_from_backend URL_REDMINE[upStage], ENV['API-KEY']
             end
         end
+
+        retVal
     end
 
     def fetch_data uri, headers = {}
