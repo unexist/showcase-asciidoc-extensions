@@ -14,11 +14,13 @@ require 'net/http'
 require 'uri'
 require 'json'
 require 'date'
+require 'set'
+require 'stringio'
 
 include Asciidoctor
 include ShowcaseEnv
 
-class HealthcheckInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
+class HealthcheckBlockMacro < Asciidoctor::Extensions::BlockMacroProcessor
     use_dsl
 
     named :healthcheck
@@ -31,14 +33,20 @@ class HealthcheckInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
         when 'BACKENDS'
             statusCode = handle_backends attrs
 
-            create_inline_pass(parent, HTML_SPAN % [
+            create_pass_block(parent, HTML_SPAN % [
                 200 == statusCode ? 'green' : 'red',
                 200 == statusCode ? HTML_TICK : '%s (HTTP%d)' % [ HTML_CROSS, statusCode ],
-            ])
+            ], attrs)
         when 'STORE'
             fileName = '%s.csv' % [ attrs['filename'] || 'healthchecks' ]
 
             persist_data fileName
+        when 'PLOT'
+            fileName = '%s.csv' % [ attrs['filename'] || 'healthchecks' ]
+            componentName = attrs['component'] || 'BLOG'
+            content = plot_data fileName, componentName
+
+            parse_content parent, content, attrs
         end
     end
 
@@ -122,10 +130,58 @@ class HealthcheckInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
 
         nil
     end
+
+        def plot_data fileName, componentName
+        histData = {}
+        histStages = Set.new
+
+        # Load and sift data
+        File.open(fileName, 'r') do |f|
+            f.each_line do |line|
+                atTime, component, stage, statusCode = line.split ',' rescue []
+
+                if (componentName.upcase rescue 'BLOG') == component.upcase
+                    formattedDate = Time.at(atTime.to_i).to_datetime.strftime('%Y/%m/%d') rescue '9999/9/9'
+
+                    histData[formattedDate] ||= Set.new
+                    histData[formattedDate] << {
+                        stage: stage,
+                        statusCode: statusCode,
+                    }
+                    histStages << stage
+                end
+            end
+        end
+
+        # Plotting time
+        buffer = StringIO.new
+        buffer.puts '[plantuml]'
+        buffer.puts '----'
+
+        histStages.each do |stage|
+            buffer.puts 'robust "%s" as %s' % [ stage, stage ]
+        end
+
+        buffer.puts
+
+        histData.each do |key, value|
+            buffer.puts '@%s' % key
+
+            value.each do |v|
+                buffer.puts '%s is HTTP%s' % [ v[:stage], v[:statusCode] ]
+            end
+
+            buffer.puts
+        end
+
+        buffer.puts '----'
+
+        buffer.string
+    end
 end
 
 Asciidoctor::Extensions.register do
     if @document.basebackend? 'html'
-        inline_macro HealthcheckInlineMacro
+        block_macro HealthcheckBlockMacro
     end
 end
