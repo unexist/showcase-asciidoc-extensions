@@ -29,3 +29,11 @@ a| healthcheck:backends[component="redmine" stage="test"]
 a| healthcheck:backends[component="redmine" stage="staging"]
 a| healthcheck:backends[component="redmine" stage="prod"]
 |===
+
+healthcheck:store[filename="healthchecks"]
+
+[%noheader,cols="1,1"]
+|===
+a| healthplot::backends[filename="healthchecks" component="blog"]
+a| healthplot::backends[filename="healthchecks" component="redmine"]
+|===
