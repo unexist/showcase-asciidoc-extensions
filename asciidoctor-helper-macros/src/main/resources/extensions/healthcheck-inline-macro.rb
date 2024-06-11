@@ -13,7 +13,6 @@ require 'asciidoctor/extensions' unless RUBY_ENGINE == 'opal'
 require 'net/http'
 require 'uri'
 require 'json'
-require 'date'
 
 include Asciidoctor
 include ShowcaseEnv
@@ -24,31 +23,45 @@ class HealthcheckInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
     named :healthcheck
     name_positional_attributes 'component', 'stage'
 
+    @@CAPTURED_VALUES = []
+
     def process parent, target, attrs
-        case target
-        when 'backends'
-            statusCode = handle_backends(attrs)
+        case target.upcase
+        when 'BACKENDS'
+            statusCode = handle_backends attrs
 
             create_inline_pass(parent, HTML_SPAN % [
                 200 == statusCode ? 'green' : 'red',
-                200 == statusCode ? HTML_TICK : '%s (HTTP %d)' % [ HTML_CROSS, statusCode ],
+                200 == statusCode ? HTML_TICK : '%s (HTTP%d)' % [ HTML_CROSS, statusCode ],
             ])
+        when 'STORE'
+            fileName = '%s.csv' % [ attrs['filename'] || 'healthchecks' ]
+
+            persist_data fileName
         end
     end
 
     private
 
     def handle_backends attrs
-        case attrs['component']
-        when 'blog'
-            if URL_BLOG.include? attrs['stage'].upcase
-                load_from_backend URL_BLOG[attrs['stage'].upcase]
+        upComponent = attrs['component'].upcase rescue 'BLOG'
+        upStage = attrs['stage'].upcase rescue 'DEV'
+        statusCode = 500
+
+        case upComponent
+        when 'BLOG'
+            if URL_BLOG.include? upStage
+                statusCode = load_from_backend URL_BLOG[upStage]
             end
-        when 'redmine'
-            if URL_REDMINE.include? attrs['stage'].upcase
-                load_from_backend URL_REDMINE[attrs['stage'].upcase]
+        when 'REDMINE'
+            if URL_REDMINE.include? upStage
+                statusCode = load_from_backend URL_REDMINE[upStage]
             end
         end
+
+        store_data upComponent, upStage, statusCode
+
+        statusCode
     end
 
     def get_status uri, headers = {}
@@ -65,12 +78,15 @@ class HealthcheckInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
                 http.request request
             }
 
-            unless response.nil?
+            case response
+            when Net::HTTPSuccess
                 statusCode = response.code.to_i
 
                 unless 200 == statusCode
                     p "-" * 20, uri.to_s, response.body, "-" * 20
                 end
+            when Net::HTTPRedirection
+                statusCode = get_status URI.parse(response['location']), headers rescue 500
             end
         rescue => err
             p err
@@ -84,6 +100,26 @@ class HealthcheckInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
             'accept' => 'application/json',
             'API-Key' => apiKey,
         } rescue 500
+    end
+
+    def store_data component, stage, statusCode
+        @@CAPTURED_VALUES << {
+            component: component,
+            stage: stage,
+            statusCode: statusCode
+        }
+    end
+
+    def persist_data fileName
+        File.open(fileName, 'a+') do |f|
+            timeNow = Time.now.to_i
+
+            @@CAPTURED_VALUES.each do | v |
+                f.puts '%d,%s,%s,%d' % [ timeNow, v[:component], v[:stage], v[:statusCode] ]
+            end
+        end
+
+        nil
     end
 end
 
