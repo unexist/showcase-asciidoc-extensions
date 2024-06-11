@@ -22,9 +22,7 @@ public class HelperRegistry implements ExtensionRegistry {
                 .loadClass(HelperRegistry.class.getResourceAsStream("/extensions/env.rb"))
                 .loadClass(HelperRegistry.class.getResourceAsStream("/extensions/checkversion-inline-macro.rb"))
                 .inlineMacro("checkversion", "CheckversionInlineMacro")
-                .loadClass(HelperRegistry.class.getResourceAsStream("/extensions/healthcheck-inline-macro.rb"))
-                .inlineMacro("healthcheck", "HealthcheckInlineMacro")
-                .loadClass(HelperRegistry.class.getResourceAsStream("/extensions/healthplot-block-macro.rb"))
-                .blockMacro("healthplot", "HealthplotBlockMacro");
+                .loadClass(HelperRegistry.class.getResourceAsStream("/extensions/healthcheck-block-macro.rb"))
+                .blockMacro("healthcheck", "HealthcheckBlockMacro");
     }
 }

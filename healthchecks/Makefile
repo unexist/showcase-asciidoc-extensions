@@ -10,8 +10,7 @@ INDEX_FILE := healthchecks
 test:
 	asciidoctor \
 		-r ../asciidoctor-helper-macros/src/main/resources/extensions/env.rb \
-		-r ../asciidoctor-helper-macros/src/main/resources/extensions/healthcheck-inline-macro.rb \
-		-r ../asciidoctor-helper-macros/src/main/resources/extensions/healthplot-block-macro.rb \
+		-r ../asciidoctor-helper-macros/src/main/resources/extensions/healthcheck-block-macro.rb \
 		--trace -D . src/site/asciidoc/$(INDEX_FILE).adoc
 
 test-open:
