@@ -13,6 +13,7 @@ require 'asciidoctor/extensions' unless RUBY_ENGINE == 'opal'
 require 'net/http'
 require 'uri'
 require 'json'
+require 'date'
 
 include Asciidoctor
 include ShowcaseEnv
