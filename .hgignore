@@ -8,3 +8,4 @@ target/
 
 # Generated files
 **/*.html
+**/healthchecks.csv

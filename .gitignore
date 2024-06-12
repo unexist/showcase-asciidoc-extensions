@@ -37,3 +37,4 @@ release.properties
 
 # Generated files
 **/*.html
+**/healthchecks.csv
