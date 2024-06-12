@@ -131,7 +131,7 @@ class HealthcheckBlockMacro < Asciidoctor::Extensions::BlockMacroProcessor
         nil
     end
 
-        def plot_data fileName, componentName
+    def plot_data fileName, componentName
         histData = {}
         histStages = Set.new
 
