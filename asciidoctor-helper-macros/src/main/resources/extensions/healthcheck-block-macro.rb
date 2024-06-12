@@ -167,6 +167,8 @@ class HealthcheckBlockMacro < Asciidoctor::Extensions::BlockMacroProcessor
         histData.each do |key, value|
             buffer.puts '@%s' % key
 
+            value.sort { |a, b| a[:statusCode] <=> b[:statusCode] }
+
             value.each do |v|
                 buffer.puts '%s is HTTP%s' % [ v[:stage], v[:statusCode] ]
             end
