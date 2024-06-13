@@ -105,7 +105,7 @@ class CheckversionInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
                 end
             end
         rescue => err
-            p err
+            error_log err
         end
 
         [ statusCode, retVal ]
@@ -130,8 +130,7 @@ class CheckversionInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
 
                 versionString = matches.first.first unless matches.nil? or matches.empty?
             rescue => err
-                p err
-                retVal = 'x.x'
+                error_log err
             end unless match.nil?
         end unless data.nil?
 

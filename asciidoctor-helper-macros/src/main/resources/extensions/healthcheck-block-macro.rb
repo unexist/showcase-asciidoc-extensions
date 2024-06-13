@@ -1,7 +1,7 @@
 ##
 # @package Showcase-Asciidoc-Extensions
 #
-# @file Healthcheck inline macro
+# @file Healthcheck block macro
 # @copyright 2023-present Christoph Kappel <christoph@unexist.dev>
 # @version $Id$
 #
@@ -98,7 +98,7 @@ class HealthcheckBlockMacro < Asciidoctor::Extensions::BlockMacroProcessor
                 statusCode = get_status URI.parse(response['location']), headers rescue 500
             end
         rescue => err
-            p err
+            error_log err
         end
 
         statusCode
@@ -120,12 +120,16 @@ class HealthcheckBlockMacro < Asciidoctor::Extensions::BlockMacroProcessor
     end
 
     def persist_data fileName
-        File.open(fileName, 'a+') do |f|
-            timeNow = Time.now.to_i
+        begin
+            File.open(fileName, 'a+') do |f|
+                timeNow = Time.now.to_i
 
-            @@CAPTURED_VALUES.each do | v |
-                f.puts '%d,%s,%s,%d' % [ timeNow, v[:component], v[:stage], v[:statusCode] ]
+                @@CAPTURED_VALUES.each do | v |
+                    f.puts '%d,%s,%s,%d' % [ timeNow, v[:component], v[:stage], v[:statusCode] ]
+                end
             end
+        rescue => err
+            error_log err
         end
 
         nil
@@ -136,21 +140,25 @@ class HealthcheckBlockMacro < Asciidoctor::Extensions::BlockMacroProcessor
         histStages = Set.new
 
         # Load and sift data
-        File.open(fileName, 'r') do |f|
-            f.each_line do |line|
-                atTime, component, stage, statusCode = line.split ',' rescue []
+        begin
+            File.open(fileName, 'r') do |f|
+                f.each_line do |line|
+                    atTime, component, stage, statusCode = line.split ','
 
-                if (componentName.upcase rescue 'BLOG') == component.upcase
-                    formattedDate = Time.at(atTime.to_i).to_datetime.strftime('%Y/%m/%d') rescue '9999/9/9'
+                    if componentName.upcase == component.upcase
+                        formattedDate = Time.at(atTime.to_i).to_datetime.strftime('%Y/%m/%d') rescue '9999/9/9'
 
-                    histData[formattedDate] ||= Set.new
-                    histData[formattedDate] << {
-                        stage: stage,
-                        statusCode: statusCode,
-                    }
-                    histStages << stage
+                        histData[formattedDate] ||= Set.new
+                        histData[formattedDate] << {
+                            stage: stage,
+                            statusCode: statusCode,
+                        }
+                        histStages << stage
+                    end
                 end
             end
+        rescue => err
+            error_log err
         end
 
         # Plotting time
