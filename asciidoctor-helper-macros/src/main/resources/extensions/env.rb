@@ -30,4 +30,8 @@ module ShowcaseEnv
     HTML_SPAN = '<span style="width: 100%%; height: 100%%; display: inline-block; background-color: %s">%s</span>'
     HTML_TICK = '<ac:emoticon ac:name="tick" />'
     HTML_CROSS = '<ac:emoticon ac:name="cross" />'
+
+    def error_log err
+        p "Exception occurred #{err.class}. Message: #{err.message}. Backtrace:  \n #{err.backtrace.join('\n')}"
+    end
 end
