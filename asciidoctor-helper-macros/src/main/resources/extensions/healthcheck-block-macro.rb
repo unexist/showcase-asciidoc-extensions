@@ -146,7 +146,7 @@ class HealthcheckBlockMacro < Asciidoctor::Extensions::BlockMacroProcessor
                     atTime, component, stage, statusCode = line.split ','
 
                     if componentName.upcase == component.upcase
-                        formattedDate = Time.at(atTime.to_i).to_datetime.strftime('%Y/%m/%d') rescue '9999/9/9'
+                        formattedDate = Time.at(atTime.to_i).to_datetime.strftime('%H:%M:00') rescue '00:00:00'
 
                         histData[formattedDate] ||= Set.new
                         histData[formattedDate] << {
@@ -165,6 +165,8 @@ class HealthcheckBlockMacro < Asciidoctor::Extensions::BlockMacroProcessor
         buffer = StringIO.new
         buffer.puts '[plantuml]'
         buffer.puts '----'
+        # https://forum.plantuml.net/15855/timing-diagram
+        buffer.puts 'scale 6120 as 60 pixels'
 
         histStages.each do |stage|
             buffer.puts 'robust "%s" as %s' % [ stage, stage ]
