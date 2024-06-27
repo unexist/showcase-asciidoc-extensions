@@ -10,8 +10,10 @@
 ##
 
 module ShowcaseEnv
-    URL_APPSTORE_ANDROID = 'https://play.google.com/store/apps/details?id=com.google.android.apps.maps'
-    URL_APPSTORE_IOS = 'https://itunes.apple.com/lookup?id=585027354'
+    URL_APPSTORE = {
+        'PLAYSTORE' => 'https://play.google.com/store/apps/details?id=com.google.android.apps.maps',
+        'APPSTORE' => 'https://itunes.apple.com/lookup?id=585027354',
+    }
 
     URL_BLOG = {
         'DEV' => 'https://unexist.blog',
@@ -27,7 +29,7 @@ module ShowcaseEnv
         'PROD' => 'https://subtle.de',
     }
 
-    HTML_SPAN = '<span style="width: 100%%; height: 100%%; display: inline-block; background-color: %s">%s</span>'
+    HTML_SPAN = '<span style="width: 100%%; height: 100%%; display: inline-block; color: %s">%s</span>'
     HTML_TICK = '<ac:emoticon ac:name="tick" />'
     HTML_CROSS = '<ac:emoticon ac:name="cross" />'
 

@@ -35,9 +35,10 @@ class CheckversionInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
             statusCode, versionString = handle_backends attrs
         end
 
-        create_inline_pass parent, (200 == statusCode ? versionString : '%s (HTTP%d)' % [
-            versionString, statusCode
-        ])
+        create_inline_pass parent, HTML_SPAN % [
+            200 == statusCode ? 'green' : 'red',
+            200 == statusCode ? versionString : '%s (HTTP%d)' % [ HTML_CROSS, statusCode ],
+        ]
     end
 
     private
@@ -45,21 +46,23 @@ class CheckversionInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
     def handle_apps attrs
         upComponent = attrs['component'].upcase rescue 'MAPS'
         upStage = attrs['stage'].upcase rescue 'APPSTORE'
-        upOs = attrs['os'].upcase rescue 'ANDROID'
-
+        retVal = [ 500, '' ]
 
         case upComponent
         when 'MAPS'
             case upStage
             when 'APPSTORE'
-                case upOs
-                when 'ANDROID'
-                    load_from_playstore URL_APPSTORE_ANDROID
-                when 'IOS'
-                    load_from_appstore URL_APPSTORE_IOS
+                if URL_APPSTORE.include? upStage
+                    retVal = load_from_appstore URL_APPSTORE[upStage]
+                end
+            when 'PLAYSTORE'
+                if URL_APPSTORE.include? upStage
+                    retVal = load_from_playstore URL_APPSTORE[upStage]
                 end
             end
         end
+
+        retVal
     end
 
     def handle_backends attrs
@@ -121,7 +124,7 @@ class CheckversionInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
     end
 
     def load_from_playstore url
-        data = fetch_data URI.parse(url)
+        statusCode, data = fetch_data URI.parse(url)
         versionString = 'x.x'
 
         data.scan(/<script nonce=\"\S+\">AF_initDataCallback\((.*?)\);/) do |match|
