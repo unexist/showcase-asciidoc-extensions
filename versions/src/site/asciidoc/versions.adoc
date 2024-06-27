@@ -14,25 +14,30 @@ This page is automatically updated, so please *do not* update manually.
 
 == List of component versions
 
+=== Apps
+
 |===
-| Component | DEV | Test | Staging | Prod | iOS | Android
+| Component | AppStore (iOS) | PlayStore (Android)
 
 | Maps
-4+h|
-a| checkversion:apps[component="maps" os="ios" stage="appstore"]
-a| checkversion:apps[component="maps" os="android" stage="appstore"]
+a| checkversion:apps[component="maps" stage="appstore"]
+a| checkversion:apps[component="maps" stage="playstore"]
+|===
 
-| Blog
+=== Backends
+
+|===
+| Component | DEV | Test | Staging | Prod
+
+h| Blog
 a| checkversion:backends[component="blog" stage="dev"]
 a| checkversion:backends[component="blog" stage="test"]
 a| checkversion:backends[component="blog" stage="staging"]
 a| checkversion:backends[component="blog" stage="prod"]
-2+h|
 
-| Redmine
+h| Redmine
 a| checkversion:backends[component="redmine" stage="dev"]
 a| checkversion:backends[component="redmine" stage="test"]
 a| checkversion:backends[component="redmine" stage="staging"]
 a| checkversion:backends[component="redmine" stage="prod"]
-2+h|
 |===
