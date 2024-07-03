@@ -14,6 +14,7 @@ require 'net/http'
 require 'uri'
 require 'json'
 require 'date'
+require 'time'
 require 'set'
 require 'stringio'
 
@@ -27,6 +28,8 @@ class HealthcheckBlockMacro < Asciidoctor::Extensions::BlockMacroProcessor
     name_positional_attributes 'component', 'stage'
 
     @@CAPTURED_VALUES = []
+    @@HIST_DATA = nil
+    @@HIST_STAGES = nil
 
     def process parent, target, attrs
         case target.upcase
@@ -135,25 +138,34 @@ class HealthcheckBlockMacro < Asciidoctor::Extensions::BlockMacroProcessor
         nil
     end
 
-    def plot_data fileName, componentName
+    def load_and_compact_data fileName
         histData = {}
         histStages = Set.new
 
-        # Load and sift data
         begin
+            # Load and compact data
             File.open(fileName, 'r') do |f|
                 f.each_line do |line|
                     atTime, component, stage, statusCode = line.split ','
 
-                    if componentName.upcase == component.upcase
-                        formattedDate = Time.at(atTime.to_i).to_datetime.strftime('%H:%M:00') rescue '00:00:00'
+                    formattedDate = Time.at(atTime.to_i).to_datetime.strftime('%H:00:00') rescue '00:00:00'
 
-                        histData[formattedDate] ||= Set.new
-                        histData[formattedDate] << {
-                            stage: stage,
-                            statusCode: statusCode,
-                        }
-                        histStages << stage
+                    histData[formattedDate] ||= Set.new
+                    histData[formattedDate] << {
+                        component: component,
+                        stage: stage,
+                        statusCode: statusCode
+                    }
+                    histStages << stage
+                end
+            end
+
+            # Write back data
+            File.open(fileName, 'w') do |f|
+                histData.each do |atTime, valueSet|
+                    valueSet.each do |setElem|
+                        f.puts '%d,%s,%s,%d' % [Time.parse(atTime).to_i, setElem[:component],
+                                                setElem[:stage], setElem[:statusCode] ]
                     end
                 end
             end
@@ -161,26 +173,38 @@ class HealthcheckBlockMacro < Asciidoctor::Extensions::BlockMacroProcessor
             error_log err
         end
 
+        @@HIST_DATA = histData
+        @@HIST_STAGES = histStages
+    end
+
+    def plot_data fileName, componentName
         # Plotting time
         buffer = StringIO.new
+        buffer.puts '.%s' % componentName.capitalize
         buffer.puts '[plantuml]'
         buffer.puts '----'
         # https://forum.plantuml.net/15855/timing-diagram
-        buffer.puts 'scale 6120 as 60 pixels'
+        buffer.puts 'scale 3600 as 60 pixels'
 
-        histStages.each do |stage|
+        if @@HIST_STAGES.nil?
+            load_and_compact_data fileName
+        end
+
+        @@HIST_STAGES.each do |stage|
             buffer.puts 'robust "%s" as %s' % [ stage, stage ]
         end
 
         buffer.puts
 
-        histData.each do |key, value|
-            buffer.puts '@%s' % key
+        @@HIST_DATA.each do |atTime, valueSet|
+            valueSet.sort { |a, b| a[:statusCode] <=> b[:statusCode] }
 
-            value.sort { |a, b| a[:statusCode] <=> b[:statusCode] }
+            buffer.puts '@%s' % atTime
 
-            value.each do |v|
-                buffer.puts '%s is HTTP%s' % [ v[:stage], v[:statusCode] ]
+            valueSet.each do |setElem|
+                if componentName.upcase == setElem[:component].upcase
+                    buffer.puts '%s is HTTP%s' % [ setElem[:stage], setElem[:statusCode] ]
+                end
             end
 
             buffer.puts
