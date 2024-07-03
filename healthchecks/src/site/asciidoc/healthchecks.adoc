@@ -37,3 +37,8 @@ healthcheck::store[filename="healthchecks"]
 a| healthcheck::plot[filename="healthchecks" component="blog"]
 a| healthcheck::plot[filename="healthchecks" component="redmine"]
 |===
+
+[subs="attributes"]
+----
+Last update: {localdatetime}
+----

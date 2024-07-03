@@ -41,3 +41,8 @@ a| checkversion:backends[component="redmine" stage="test"]
 a| checkversion:backends[component="redmine" stage="staging"]
 a| checkversion:backends[component="redmine" stage="prod"]
 |===
+
+[subs="attributes"]
+----
+Last update: {localdatetime}
+----
