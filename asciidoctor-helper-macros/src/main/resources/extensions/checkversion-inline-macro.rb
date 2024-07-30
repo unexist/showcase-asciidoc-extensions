@@ -127,7 +127,7 @@ class CheckversionInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
         statusCode, data = fetch_data URI.parse(url)
         versionString = 'x.x'
 
-        data.scan(/<script nonce=\"\S+\">AF_initDataCallback\((.*?)\);/) do |match|
+        data.scan(/<script \S+ nonce=\"\S+\">AF_initDataCallback\((.*?)\);/) do |match|
             begin
                 matches = match.first.scan(/(\d+\.\d+\.\d+)/)
 
