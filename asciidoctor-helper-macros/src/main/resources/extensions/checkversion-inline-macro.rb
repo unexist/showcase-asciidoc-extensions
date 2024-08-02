@@ -99,13 +99,15 @@ class CheckversionInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
                 http.request request
             }
 
-            unless response.nil?
+            case response
+            when Net::HTTPSuccess
                 statusCode = response.code.to_i
                 retVal = response.body
-
-                unless 200 == statusCode
-                    p "-" * 20, uri, response.body, "-" * 20
-                end
+            when Net::HTTPRedirection
+                statusCode = get_status URI.parse(response['location']), headers rescue 500
+            else
+                statusCode = response.code.to_i
+                p "-" * 20, uri.to_s, statusCode, response.body, "-" * 20
             end
         rescue => err
             error_log err

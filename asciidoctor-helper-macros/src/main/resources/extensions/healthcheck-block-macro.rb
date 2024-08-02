@@ -93,12 +93,11 @@ class HealthcheckBlockMacro < Asciidoctor::Extensions::BlockMacroProcessor
             case response
             when Net::HTTPSuccess
                 statusCode = response.code.to_i
-
-                unless 200 == statusCode
-                    p "-" * 20, uri.to_s, response.body, "-" * 20
-                end
             when Net::HTTPRedirection
                 statusCode = get_status URI.parse(response['location']), headers rescue 500
+            else
+                statusCode = response.code.to_i
+                p "-" * 20, uri.to_s, statusCode, response.body, "-" * 20
             end
         rescue => err
             error_log err
